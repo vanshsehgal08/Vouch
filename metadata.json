@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Gemini Referral Email Crafter",
+  "description": "An application that uses Gemini to craft personalized referral request emails based on a template, company details, and a job description.",
+  "requestFramePermissions": []
+}
