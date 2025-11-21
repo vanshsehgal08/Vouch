@@ -1,7 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import Header from './components/Header';
+import React, { useState, useCallback, useEffect } from 'react';
+import Layout from './components/Layout';
+import { View } from './components/Sidebar';
 import ReferralForm from './components/ReferralForm';
 import GeneratedEmail from './components/GeneratedEmail';
+import HistoryView from './components/HistoryView';
+import TemplatesView from './components/TemplatesView';
 import { generateReferralEmail } from './services/geminiService';
 
 export interface FormData {
@@ -24,6 +27,7 @@ export interface FormData {
 }
 
 const App: React.FC = () => {
+  const [currentView, setCurrentView] = useState<View>('home');
   const [formData, setFormData] = useState<FormData>({
     companyName: '',
     role: '',
@@ -56,14 +60,29 @@ const App: React.FC = () => {
     }));
   };
 
+  const saveToHistory = (email: string) => {
+    const newItem = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      email,
+      subject: email.split('\n')[0].replace('Subject:', '').trim(),
+      companyName: formData.companyName,
+      role: formData.role
+    };
+    
+    const existingHistory = JSON.parse(localStorage.getItem('email_history') || '[]');
+    const newHistory = [newItem, ...existingHistory].slice(0, 50); // Keep last 50
+    localStorage.setItem('email_history', JSON.stringify(newHistory));
+  };
+
   const handleGenerateClick = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     setGeneratedEmail('');
-    console.log('Generate clicked with form data:', formData);
     try {
       const email = await generateReferralEmail(formData);
       setGeneratedEmail(email);
+      saveToHistory(email);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
       console.error(err);
@@ -72,27 +91,67 @@ const App: React.FC = () => {
     }
   }, [formData]);
 
-  return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
-        <Header />
-        <main className="mt-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <ReferralForm
-              formData={formData}
-              onFormChange={handleFormChange}
-              onGenerateClick={handleGenerateClick}
-              isLoading={isLoading}
-            />
-            <GeneratedEmail
-              email={generatedEmail}
-              isLoading={isLoading}
-              error={error}
-            />
+  const handleSaveTemplate = () => {
+    const name = prompt('Enter a name for this template:', `${formData.companyName} - ${formData.role}`);
+    if (name) {
+      const newTemplate = {
+        id: Date.now().toString(),
+        name,
+        timestamp: Date.now(),
+        data: formData
+      };
+      const existingTemplates = JSON.parse(localStorage.getItem('form_templates') || '[]');
+      localStorage.setItem('form_templates', JSON.stringify([newTemplate, ...existingTemplates]));
+      alert('Template saved!');
+    }
+  };
+
+  const handleRestoreHistory = (email: string) => {
+    setGeneratedEmail(email);
+    setCurrentView('home');
+  };
+
+  const handleApplyTemplate = (data: FormData) => {
+    setFormData(data);
+    setCurrentView('home');
+  };
+
+  const renderContent = () => {
+    switch (currentView) {
+      case 'home':
+        return (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 h-full">
+            <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
+              <ReferralForm
+                formData={formData}
+                onFormChange={handleFormChange}
+                onGenerateClick={handleGenerateClick}
+                onSaveTemplate={handleSaveTemplate}
+                isLoading={isLoading}
+              />
+            </div>
+            <div className="h-full overflow-y-auto pl-2 custom-scrollbar">
+              <GeneratedEmail
+                email={generatedEmail}
+                isLoading={isLoading}
+                error={error}
+              />
+            </div>
           </div>
-        </main>
-      </div>
-    </div>
+        );
+      case 'history':
+        return <HistoryView onRestore={handleRestoreHistory} />;
+      case 'templates':
+        return <TemplatesView onApply={handleApplyTemplate} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Layout currentView={currentView} onViewChange={setCurrentView}>
+      {renderContent()}
+    </Layout>
   );
 };
 

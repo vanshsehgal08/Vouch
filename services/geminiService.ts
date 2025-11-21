@@ -92,7 +92,16 @@ ${additionalInstructions || "No additional instructions provided."}
 **Email Structure (FOLLOW THIS EXACTLY):**
 
 **Subject Line:**
-Create a clear and professional subject line using the exact role and job ID. Format: "Referral Request for ${role} (Job ID: ${jobId})"
+CRITICAL: The subject line MUST include the complete job ID number.
+Write EXACTLY this format, filling in the actual values:
+"Referral Request for [ROLE_NAME] (Job ID: [JOB_ID_NUMBER])"
+
+For this email:
+- ROLE_NAME = ${role}
+- JOB_ID_NUMBER = ${jobId}
+
+Example output: "Referral Request for Data Scientist (Job ID: ABC123)"
+DO NOT write just "(" without the job ID. The job ID MUST be included.
 
 **Email Body:**
 
@@ -115,7 +124,9 @@ Analyze the job description carefully to determine what the role requires, then 
 
 **Paragraph 2 (Expressing Interest - DYNAMIC):**
 This paragraph should be 2-3 sentences. Analyze the job description carefully and:
-- Mention the specific role name and company name
+- Express your interest in the specific role at the company
+- When mentioning the role, write: "${role} role at ${companyName} (Job ID: ${jobId})"
+- CRITICAL: Include the COMPLETE phrase with job ID. Do NOT write just "(" or omit the job ID number.
 - Show that you understand what the role entails by referencing specific aspects from the job description
 - Mention something specific about the company or role that demonstrates you've read and understood the JD
 - Connect your interest to specific requirements or responsibilities mentioned in the job description
@@ -216,8 +227,12 @@ https://www.vanshx.live
       throw new Error("Received empty response from Gemini API");
     }
     
-    // Post-process the email to add closing items based on checkboxes
+    // The AI now generates the job ID correctly, so no post-processing needed
     let finalEmail = generatedText.trim();
+    
+    console.log('Generated email (first 300 chars):', finalEmail.substring(0, 300));
+    
+    // Post-process the email to add closing items based on checkboxes
     
     // Build closing items based on checkboxes
     const closingItems: string[] = [];
