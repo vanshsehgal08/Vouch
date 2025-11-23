@@ -264,6 +264,17 @@ const GeneratedEmail: React.FC<GeneratedEmailProps> = ({ email, isLoading, error
 
                 <div className="flex items-center gap-2">
                   <button
+                      onClick={() => {
+                        const gmailUrl = `https://mail.google.com/mail/u/0/?view=cm&fs=1&tf=1&source=mailto&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                        window.open(gmailUrl, '_blank');
+                      }}
+                      className="p-2 hover:bg-white rounded-lg text-gray-600 hover:text-black transition-colors flex items-center gap-2"
+                      title="Open in Gmail"
+                  >
+                      <Mail className="w-4 h-4" />
+                      <span className="text-xs font-bold hidden sm:inline">Gmail</span>
+                  </button>
+                  <button
                       onClick={handleDownloadPDF}
                       className="p-2 hover:bg-white rounded-lg text-gray-600 hover:text-black transition-colors flex items-center gap-2"
                       title="Download PDF"

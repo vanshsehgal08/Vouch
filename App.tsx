@@ -8,6 +8,7 @@ import GeneratedCoverLetter from './components/GeneratedCoverLetter';
 import HistoryView, { HistoryItem } from './components/HistoryView';
 import TemplatesView from './components/TemplatesView';
 import ProfileView, { UserProfile } from './components/ProfileView';
+import ResumeBuilder from './components/ResumeBuilder';
 import { generateReferralEmail, generateCoverLetter } from './services/geminiService';
 import { useNotification } from './components/Notification';
 
@@ -243,6 +244,8 @@ const App: React.FC = () => {
             </div>
           </div>
         );
+      case 'resume-builder':
+        return <ResumeBuilder />;
       case 'history':
         return <HistoryView onRestore={handleRestoreHistory} />;
       case 'templates':

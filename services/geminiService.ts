@@ -504,3 +504,86 @@ Provide ONLY the body of the cover letter (including header/date/salutation/sign
     throw new Error("Failed to generate cover letter. Please try again.");
   }
 };
+
+export const modifyResume = async (latexCode: string, userRequest: string): Promise<string> => {
+  if (!latexCode.trim()) {
+    throw new Error("Please provide your LaTeX resume code first.");
+  }
+
+  if (!userRequest.trim()) {
+    throw new Error("Please tell me what you'd like to change.");
+  }
+
+  const prompt = `You are a LaTeX resume editor assistant. The user has a resume in LaTeX format and wants to make changes.
+
+**Current LaTeX Code:**
+\`\`\`latex
+${latexCode}
+\`\`\`
+
+**User Request:** "${userRequest}"
+
+**Instructions:**
+1. Analyze the user's request carefully
+2. Modify ONLY the content that the user requested to change
+3. Maintain the EXACT formatting, spacing, structure, and style
+4. Do NOT change:
+   - Document class or packages
+   - Custom commands or macros
+   - Overall layout or margins
+   - Section formatting
+5. If the request is unclear or ambiguous, ask for clarification
+
+**Common Requests and How to Handle Them:**
+- "Add skill: X" → Add X to the appropriate skills section
+- "Change CGPA to Y" → Update the CGPA value in the education section
+- "Remove project Z" → Delete the entire project entry
+- "Add experience at Company" → Add a new experience entry
+- "Make summary shorter" → Condense the summary while keeping key points
+
+**Output Format:**
+If the request is clear and can be executed:
+- Return ONLY the complete modified LaTeX code
+- Do NOT include any explanations before or after the code
+- Do NOT use markdown code blocks
+
+If the request is unclear:
+- Start with "CLARIFICATION NEEDED:" followed by your question
+- Do NOT modify the LaTeX code
+
+Now, process the user's request:`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ]
+    });
+
+    let generatedText: string;
+    if (response && 'text' in response) {
+      generatedText = (response as any).text;
+    } else if (response && 'candidates' in response && Array.isArray((response as any).candidates)) {
+      const candidates = (response as any).candidates;
+      if (candidates.length > 0 && candidates[0].content && candidates[0].content.parts) {
+        generatedText = candidates[0].content.parts
+          .map((part: any) => part.text || '')
+          .join('');
+      } else {
+        throw new Error("No text content in response candidates");
+      }
+    } else {
+      throw new Error(`Unexpected response format.`);
+    }
+
+    return generatedText.trim();
+  } catch (error) {
+    console.error("Error modifying resume:", error);
+    throw new Error("Failed to modify resume. Please try again.");
+  }
+};
+

@@ -1,7 +1,16 @@
 import React from 'react';
-import { PenTool, History, FileText, User } from 'lucide-react';
+import { PenTool, FileText, FileCode, History, Bookmark, User } from 'lucide-react';
 
-export type View = 'home' | 'cover-letter' | 'history' | 'templates' | 'profile';
+export type View = 'home' | 'cover-letter' | 'resume-builder' | 'history' | 'templates' | 'profile';
+
+const menuItems = [
+  { id: 'home', label: 'Referral Email', icon: PenTool },
+  { id: 'cover-letter', label: 'Cover Letter', icon: FileText },
+  { id: 'resume-builder', label: 'Resume Builder', icon: FileCode },
+  { id: 'history', label: 'History', icon: History },
+  { id: 'templates', label: 'Templates', icon: Bookmark },
+  { id: 'profile', label: 'Profile', icon: User },
+];
 
 interface SidebarProps {
   currentView: View;
@@ -9,14 +18,6 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange }) => {
-  const menuItems = [
-    { id: 'home', label: 'Referral Email', icon: PenTool },
-    { id: 'cover-letter', label: 'Cover Letter', icon: FileText },
-    { id: 'history', label: 'History', icon: History },
-    { id: 'templates', label: 'Templates', icon: FileText },
-    { id: 'profile', label: 'Profile', icon: User },
-  ];
-
   return (
     <aside className="w-20 lg:w-64 bg-white border-r-2 border-black flex flex-col items-center lg:items-stretch py-6 z-50 transition-all duration-300">
       <div className="mb-8 px-4 flex items-center justify-center lg:justify-start gap-3">
