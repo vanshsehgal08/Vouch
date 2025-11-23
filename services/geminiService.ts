@@ -34,6 +34,33 @@ export const generateReferralEmail = async (formData: FormData): Promise<string>
     throw new Error("Please provide Company Name, Role, and Job ID before generating the email.");
   }
 
+  // Load user profile data
+  let userExperience = '';
+  let userProjects = '';
+  let userName = 'Vansh Sehgal';
+  let userDegree = 'B.Tech CSE';
+  let userGradYear = '2026';
+  let userUniversity = 'VIT Vellore';
+  let userCGPA = '9.06';
+  let userWebsite = '';
+  
+  try {
+    const savedProfile = localStorage.getItem('user_profile');
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      userExperience = profile.experience || '';
+      userProjects = profile.projects || '';
+      userName = profile.name || 'Vansh Sehgal';
+      userDegree = profile.degree || 'B.Tech CSE';
+      userGradYear = profile.graduationYear || '2026';
+      userUniversity = profile.university || 'VIT Vellore';
+      userCGPA = profile.cgpa || '9.06';
+      userWebsite = profile.website || '';
+    }
+  } catch (error) {
+    console.error('Failed to load user profile:', error);
+  }
+
   // Resume context for Gemini - Only skills
   const skillsContext = `
 **Candidate's Skills (Available for Reference):**
@@ -47,18 +74,16 @@ export const generateReferralEmail = async (formData: FormData): Promise<string>
 - Methodologies: Agile (Scrum, Kanban), Waterfall, Spiral, Git Flow
 `;
 
-  // Conditionally include projects
+  // Conditionally include projects - use user-provided projects if available
   const projectsContext = includeProjects ? `
 **Projects (Only mention if relevant to the job description):**
-- CogniVue – AI-powered Interview Preparation Platform: Next.js, React, TypeScript, Google Gemini, GPT-4, Vapi AI, ElevenLabs, Firebase, Stripe, Tailwind CSS
-- LT-Companion – Chrome Extension for LeetCode: Chrome Extension, Google Gemini, JavaScript, AI Integration
-- Smart Rental Tracker – Equipment Rental Management System: Python, Machine Learning, AI Analytics, Web Dashboard, Data Visualization
+${userProjects || '- CogniVue – AI-powered Interview Preparation Platform: Next.js, React, TypeScript, Google Gemini, GPT-4, Vapi AI, ElevenLabs, Firebase, Stripe, Tailwind CSS\n- LT-Companion – Chrome Extension for LeetCode: Chrome Extension, Google Gemini, JavaScript, AI Integration\n- Smart Rental Tracker – Equipment Rental Management System: Python, Machine Learning, AI Analytics, Web Dashboard, Data Visualization'}
 ` : '';
 
-  // Conditionally include experience
+  // Conditionally include experience - use user-provided experience if available
   const experienceContext = includeExperience ? `
 **Experience (Only mention if relevant to the job description):**
-- Bharat Electronics Ltd, Ministry of Defence (May 2024 - Internship): Engineered algorithms to decode complex ASTERIX data sequences, developed Python-based system for decoding radar data packets, implemented linear regression model. Tools: Python, Pandas, NumPy, Scikit-learn, Jupyter, Wireshark, Git, Agile methodology
+${userExperience || '- Bharat Electronics Ltd, Ministry of Defence (May 2024 - Internship): Engineered algorithms to decode complex ASTERIX data sequences, developed Python-based system for decoding radar data packets, implemented linear regression model. Tools: Python, Pandas, NumPy, Scikit-learn, Jupyter, Wireshark, Git, Agile methodology'}
 ` : '';
 
   const resumeContext = `${skillsContext}${projectsContext}${experienceContext}`;
@@ -74,8 +99,8 @@ export const generateReferralEmail = async (formData: FormData): Promise<string>
 4. The rest of the output is the email body.
 
 **Candidate Information:**
-- Name: Vansh Sehgal
-- Education: B.Tech CSE (2026), VIT Vellore (CGPA: 9.06)
+- Name: ${userName}
+- Education: ${userDegree} (${userGradYear}), ${userUniversity} (CGPA: ${userCGPA})
 
 ${resumeContext}
 
@@ -93,24 +118,24 @@ ${additionalInstructions || "No additional instructions provided."}
 
 **Subject Line:**
 CRITICAL: The subject line MUST include the complete job ID number.
-Write EXACTLY this format, filling in the actual values:
-"Referral Request for [ROLE_NAME] (Job ID: [JOB_ID_NUMBER])"
+Write EXACTLY this format (do not use parentheses for the Job ID):
+"Referral Request for [ROLE_NAME] - Job ID: [JOB_ID_NUMBER]"
 
 For this email:
 - ROLE_NAME = ${role}
 - JOB_ID_NUMBER = ${jobId}
 
-Example output: "Referral Request for Data Scientist (Job ID: ABC123)"
-DO NOT write just "(" without the job ID. The job ID MUST be included.
+Example output: "Referral Request for Data Scientist - Job ID: ABC123"
+The job ID MUST be included.
 
 **Email Body:**
 
 **Paragraph 1 (Introduction - FIXED FORMAT):**
-Start with "Hi Sir," followed by a new line, then a blank line. DONT MISS IT
-Then write: "I'm Vansh Sehgal, a B.Tech CSE student (2026) from VIT Vellore (CGPA: 9.06),"
+Start with "Hi Sir," followed by a new line.
+Then write: "I'm ${userName}, a ${userDegree} student (${userGradYear}) from ${userUniversity} (CGPA: ${userCGPA}),"
 
 After the comma, continue in the SAME sentence with a passion statement that aligns with the job description. The complete sentence should be:
-"I'm Vansh Sehgal, a B.Tech CSE student (2026) from VIT Vellore (CGPA: 9.06), [passion statement based on JD]"
+"I'm ${userName}, a ${userDegree} student (${userGradYear}) from ${userUniversity} (CGPA: ${userCGPA}), [passion statement based on JD]"
 
 Analyze the job description carefully to determine what the role requires, then create an appropriate passion statement. Most roles will be technical, so prioritize technical skills and technologies. Examples:
 - If JD mentions backend development, system design, APIs, Java, scalability, distributed systems → "passionate about building scalable and reliable systems with strong fundamentals in Java, backend development, and system design."
@@ -154,14 +179,17 @@ After the ask paragraph, go directly to:
 Thank you for your time and consideration.
 
 Warm regards,
-Vansh Sehgal
-B.Tech CSE, VIT Vellore
-https://www.vanshx.live
+${userName}
+${userDegree}, ${userUniversity}
+${userWebsite ? userWebsite : ''}
 
 **IMPORTANT - Closing Section:**
 - Do NOT include Resume link, Job ID, Job Link, Email, or Contact in the closing section
 - These will be added automatically based on user preferences
 - End the ask paragraph and go directly to "Thank you for your time and consideration."
+- After "Warm regards," include only the name and education (degree, university)
+- If user has provided a website in their profile, include it on a new line after the education
+- Do NOT include any other contact info in the AI-generated part
 
 **CRITICAL INSTRUCTIONS FOR SKILLS & EXPERIENCE:**
 - Read the job description FIRST and identify ALL technologies, tools, programming languages, frameworks, and skills mentioned
@@ -229,7 +257,20 @@ https://www.vanshx.live
     
     // The AI now generates the job ID correctly, so no post-processing needed
     let finalEmail = generatedText.trim();
-    
+
+    // Helper function to convert text to Unicode bold
+    const toBold = (str: string) => {
+      const boldMap: { [key: string]: string } = {
+        'A': '𝐀', 'B': '𝐁', 'C': '𝐂', 'D': '𝐃', 'E': '𝐄', 'F': '𝐅', 'G': '𝐆', 'H': '𝐇', 'I': '𝐈', 'J': '𝐉', 'K': '𝐊', 'L': '𝐋', 'M': '𝐌', 'N': '𝐍', 'O': '𝐎', 'P': '𝐏', 'Q': '𝐐', 'R': '𝐑', 'S': '𝐒', 'T': '𝐓', 'U': '𝐔', 'V': '𝐕', 'W': '𝐖', 'X': '𝐗', 'Y': '𝐘', 'Z': '𝐙',
+        'a': '𝐚', 'b': '𝐛', 'c': '𝐜', 'd': '𝐝', 'e': '𝐞', 'f': '𝐟', 'g': '𝐠', 'h': '𝐡', 'i': '𝐢', 'j': '𝐣', 'k': '𝐤', 'l': '𝐥', 'm': '𝐦', 'n': '𝐧', 'o': '𝐨', 'p': '𝐩', 'q': '𝐪', 'r': '𝐫', 's': '𝐬', 't': '𝐭', 'u': '𝐮', 'v': '𝐯', 'w': '𝐰', 'x': '𝐱', 'y': '𝐲', 'z': '𝐳',
+        '0': '𝟎', '1': '𝟏', '2': '𝟐', '3': '𝟑', '4': '𝟒', '5': '𝟓', '6': '𝟔', '7': '𝟕', '8': '𝟖', '9': '𝟗',
+        ':': ':' // Keep colon as is
+      };
+      return str.split('').map(char => boldMap[char] || char).join('');
+    };
+
+
+
     console.log('Generated email (first 300 chars):', finalEmail.substring(0, 300));
     
     // Post-process the email to add closing items based on checkboxes
@@ -294,6 +335,20 @@ https://www.vanshx.live
       }
     }
     
+    // Auto-bold specific labels (only the label, not the value)
+    // We do this at the very end to ensure we catch labels added in the post-processing step
+    finalEmail = finalEmail.replace(/Resume:/g, toBold('Resume') + ':');
+    finalEmail = finalEmail.replace(/Job Link:/g, toBold('Job Link') + ':');
+    finalEmail = finalEmail.replace(/Job ID:/g, toBold('Job ID') + ':');
+    finalEmail = finalEmail.replace(/Email:/g, toBold('Email') + ':');
+    finalEmail = finalEmail.replace(/Contact:/g, toBold('Contact') + ':');
+
+    // Auto-bold the "Ask" paragraph
+    const askParagraph = "I'd be sincerely grateful if you could refer me for this opportunity. I completely understand a referral doesn't ensure selection, but it would mean a lot to have my profile considered.";
+    if (finalEmail.includes(askParagraph)) {
+      finalEmail = finalEmail.replace(askParagraph, toBold(askParagraph));
+    }
+
     return finalEmail.trim();
   } catch (error) {
     console.error("Error generating email with Gemini:", error);
@@ -303,5 +358,149 @@ https://www.vanshx.live
       throw new Error(`Failed to generate email: ${error.message}`);
     }
     throw new Error("Failed to generate email. Please check the console for details.");
+  }
+};
+
+export const generateCoverLetter = async (formData: FormData): Promise<string> => {
+  const { 
+    companyName, 
+    role, 
+    jobId, 
+    jobDescription, 
+    jobLink,
+    additionalInstructions,
+  } = formData;
+
+  if (!companyName || !role) {
+    throw new Error("Please provide Company Name and Role before generating the cover letter.");
+  }
+
+  // Load user profile data
+  let userExperience = '';
+  let userProjects = '';
+  let userName = 'Vansh Sehgal';
+  let userDegree = 'B.Tech CSE';
+  let userGradYear = '2026';
+  let userUniversity = 'VIT Vellore';
+  let userCGPA = '9.06';
+  let userWebsite = '';
+  let userEmail = '';
+  let userContact = '';
+  
+  try {
+    const savedProfile = localStorage.getItem('user_profile');
+    if (savedProfile) {
+      const profile = JSON.parse(savedProfile);
+      userExperience = profile.experience || '';
+      userProjects = profile.projects || '';
+      userName = profile.name || 'Vansh Sehgal';
+      userDegree = profile.degree || 'B.Tech CSE';
+      userGradYear = profile.graduationYear || '2026';
+      userUniversity = profile.university || 'VIT Vellore';
+      userCGPA = profile.cgpa || '9.06';
+      userWebsite = profile.website || '';
+      userEmail = profile.emailId || '';
+      userContact = profile.contact || '';
+    }
+  } catch (error) {
+    console.error('Failed to load user profile:', error);
+  }
+
+  const skillsContext = `
+**Candidate's Skills:**
+- Languages: Java, Python, C/C++, JavaScript, TypeScript
+- Frontend: React.js, Next.js, Tailwind CSS, Bootstrap, shadcn/ui, Zod, Chart.js
+- Backend: Node.js, Express.js, RESTful APIs, JWT/OAuth, WebSockets, Socket.io
+- Databases: PostgreSQL, MySQL, MongoDB, Redis, DynamoDB
+- CS Core: DSA, OOP, Operating Systems, DBMS, Software Architecture
+- Tools: Git, GitHub, Postman, Figma, GitHub Actions (basic), Firebase Console
+- Cloud/DevOps: AWS (EC2, S3), GCP, Docker, Vercel (CI/CD), Linux (basic)
+- Methodologies: Agile (Scrum, Kanban), Waterfall, Spiral, Git Flow
+`;
+
+  const projectsContext = `
+**Projects:**
+${userProjects || '- CogniVue – AI-powered Interview Preparation Platform\n- LT-Companion – Chrome Extension for LeetCode\n- Smart Rental Tracker – Equipment Rental Management System'}
+`;
+
+  const experienceContext = `
+**Experience:**
+${userExperience || '- Bharat Electronics Ltd, Ministry of Defence (Internship)'}
+`;
+
+  const prompt = `You are an expert career coach and professional writer. Write a compelling, professional cover letter for a software engineering role.
+
+**Candidate Details:**
+- Name: ${userName}
+- Education: ${userDegree} (${userGradYear}), ${userUniversity} (CGPA: ${userCGPA})
+- Email: ${userEmail}
+- Phone: ${userContact}
+- Website: ${userWebsite}
+${skillsContext}
+${projectsContext}
+${experienceContext}
+
+**Job Details:**
+- Company: ${companyName}
+- Role: ${role}
+- Job ID: ${jobId || 'N/A'}
+- Job Link: ${jobLink || 'N/A'}
+- Description: ${jobDescription || 'Not provided'}
+
+**Additional Instructions:**
+${additionalInstructions || "None"}
+
+**Requirements:**
+1. **Format:** Standard business letter format.
+   - Header: Candidate Name, Contact Info.
+   - Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.
+   - Recipient: Hiring Manager, ${companyName}.
+   - Address: [Company Address] (Keep this placeholder exactly as is).
+   - Salutation: "Dear Hiring Manager,"
+2. **Tone:** Professional, confident, enthusiastic, and authentic.
+3. **Content:**
+   - **Opening:** State the role applied for and express strong interest. Mention the Job ID if available.
+   - **Body Paragraph 1 (Experience/Skills):** Connect candidate's skills (Java, Python, React, Node.js, etc.) and experience to the specific requirements in the Job Description. Highlight relevant projects.
+   - **Body Paragraph 2 (Why this company/role):** Demonstrate understanding of the company/role and why the candidate is a perfect fit. Use the "Passion Statement" logic: align passion with the JD (e.g., scalable systems, full-stack, AI, etc.).
+   - **Closing:** Reiterate enthusiasm and request an interview.
+   - **Sign-off:** "Sincerely," followed by Candidate Name.
+4. **Style:** Clear, concise paragraphs. No bullet points unless absolutely necessary for impact.
+5. **Length:** ~300-400 words.
+
+**Output:**
+Provide ONLY the body of the cover letter (including header/date/salutation/sign-off). Do not include any conversational filler before or after.
+`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ]
+    });
+
+    let generatedText: string;
+    if (response && 'text' in response) {
+      generatedText = (response as any).text;
+    } else if (response && 'candidates' in response && Array.isArray((response as any).candidates)) {
+      const candidates = (response as any).candidates;
+      if (candidates.length > 0 && candidates[0].content && candidates[0].content.parts) {
+        generatedText = candidates[0].content.parts
+          .map((part: any) => part.text || '')
+          .join('');
+      } else {
+        throw new Error("No text content in response candidates");
+      }
+    } else {
+      throw new Error(`Unexpected response format.`);
+    }
+
+    return generatedText;
+  } catch (error) {
+    console.error("Error generating cover letter:", error);
+    throw new Error("Failed to generate cover letter. Please try again.");
   }
 };

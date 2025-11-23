@@ -20,12 +20,12 @@ const InputField: React.FC<{
   icon?: React.ElementType;
 }> = ({ label, name, value, onChange, placeholder, type = "text", icon: Icon }) => (
   <div className="group relative">
-    <label htmlFor={name} className="block text-xs font-medium text-cyan-400 mb-1 uppercase tracking-wider ml-1">
+    <label htmlFor={name} className="block text-xs font-bold text-black mb-2 uppercase tracking-wide ml-1">
       {label}
     </label>
     <div className="relative">
       {Icon && (
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors">
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors">
           <Icon className="w-5 h-5" />
         </div>
       )}
@@ -36,7 +36,7 @@ const InputField: React.FC<{
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={`w-full bg-slate-900/50 border border-slate-700 rounded-xl shadow-sm py-3 ${Icon ? 'pl-10' : 'pl-4'} pr-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all duration-200`}
+        className={`w-full bg-white border-2 border-gray-300 rounded-lg shadow-sm py-3 ${Icon ? 'pl-10' : 'pl-4'} pr-4 text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all duration-200`}
       />
     </div>
   </div>
@@ -49,7 +49,7 @@ const CheckboxField: React.FC<{
   onChange: ReferralFormProps['onFormChange']; 
   description?: string 
 }> = ({ label, name, checked, onChange, description }) => (
-  <div className={`flex items-start gap-3 p-3 rounded-xl border transition-all duration-200 ${checked ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-slate-900/30 border-slate-800 hover:border-slate-700'}`}>
+  <div className={`flex items-start gap-3 p-3 rounded-lg border-2 transition-all duration-200 ${checked ? 'bg-black border-black' : 'bg-white border-gray-300 hover:border-gray-400'}`}>
     <div className="relative flex items-center">
       <input
         type="checkbox"
@@ -57,7 +57,7 @@ const CheckboxField: React.FC<{
         name={name}
         checked={checked}
         onChange={onChange}
-        className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-slate-600 bg-slate-800 transition-all checked:border-cyan-500 checked:bg-cyan-500 focus:ring-2 focus:ring-cyan-500/30"
+        className="peer h-5 w-5 cursor-pointer appearance-none rounded border-2 border-gray-400 bg-white transition-all checked:border-black checked:bg-black focus:ring-2 focus:ring-black/30"
       />
       <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 transition-opacity peer-checked:opacity-100">
         <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
@@ -66,11 +66,11 @@ const CheckboxField: React.FC<{
       </div>
     </div>
     <div className="flex-1">
-      <label htmlFor={name} className={`text-sm font-medium cursor-pointer transition-colors ${checked ? 'text-cyan-100' : 'text-slate-300'}`}>
+      <label htmlFor={name} className={`text-sm font-medium cursor-pointer transition-colors ${checked ? 'text-white' : 'text-black'}`}>
         {label}
       </label>
       {description && (
-        <p className="text-xs text-slate-500 mt-0.5">{description}</p>
+        <p className={`text-xs mt-0.5 ${checked ? 'text-gray-300' : 'text-gray-500'}`}>{description}</p>
       )}
     </div>
   </div>
@@ -85,7 +85,7 @@ const TextAreaField: React.FC<{
   rows?: number 
 }> = ({ label, name, value, onChange, placeholder, rows=6 }) => (
     <div className="group">
-      <label htmlFor={name} className="block text-xs font-medium text-cyan-400 mb-1 uppercase tracking-wider ml-1">
+      <label htmlFor={name} className="block text-xs font-bold text-black mb-2 uppercase tracking-wide ml-1">
         {label}
       </label>
       <textarea
@@ -95,7 +95,7 @@ const TextAreaField: React.FC<{
         onChange={onChange}
         placeholder={placeholder}
         rows={rows}
-        className="w-full bg-slate-900/50 border border-slate-700 rounded-xl shadow-sm py-3 px-4 text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all duration-200 resize-none custom-scrollbar"
+        className="w-full bg-white border-2 border-gray-300 rounded-lg shadow-sm py-3 px-4 text-black placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all duration-200 resize-none custom-scrollbar"
       />
     </div>
 );
@@ -103,15 +103,15 @@ const TextAreaField: React.FC<{
 
 const ReferralForm: React.FC<ReferralFormProps> = ({ formData, onFormChange, onGenerateClick, onSaveTemplate, isLoading }) => {
   return (
-    <div className="bg-slate-800/40 backdrop-blur-md p-6 sm:p-8 rounded-2xl border border-slate-700/50 shadow-xl">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-          <Briefcase className="w-6 h-6 text-cyan-400" />
+    <div className="glass-light p-6 sm:p-8 rounded-lg shadow-xl">
+      <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-black">
+        <h2 className="text-2xl font-bold text-black flex items-center gap-2">
+          <Briefcase className="w-6 h-6" />
           Job Details
         </h2>
         <button 
           onClick={onSaveTemplate}
-          className="text-xs font-medium text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-slate-800 border border-transparent hover:border-slate-700"
+          className="text-xs font-bold text-gray-600 hover:text-black transition-colors flex items-center gap-1 px-3 py-1.5 rounded-lg hover:bg-gray-100 border-2 border-transparent hover:border-gray-300"
         >
           <Save className="w-3 h-3" />
           Save as Template
@@ -182,9 +182,9 @@ const ReferralForm: React.FC<ReferralFormProps> = ({ formData, onFormChange, onG
             rows={3}
          />
         
-        <div className="pt-6 border-t border-slate-700/50">
-          <h3 className="text-sm font-semibold text-slate-300 mb-4 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-purple-400" />
+        <div className="pt-6 border-t-2 border-gray-200">
+          <h3 className="text-sm font-bold text-black mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4" />
             AI Customization Options
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -240,7 +240,7 @@ const ReferralForm: React.FC<ReferralFormProps> = ({ formData, onFormChange, onG
           </div>
         </div>
         
-        <div className="pt-6 border-t border-slate-700/50 grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="pt-6 border-t-2 border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-5">
           <InputField 
             label="Your Email"
             name="emailId"
@@ -264,9 +264,8 @@ const ReferralForm: React.FC<ReferralFormProps> = ({ formData, onFormChange, onG
         <button
           onClick={onGenerateClick}
           disabled={isLoading}
-          className="w-full group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
+          className="w-full group relative overflow-hidden bg-black hover:bg-gray-800 text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed disabled:scale-100 disabled:shadow-none"
         >
-          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
           <div className="relative flex items-center justify-center gap-2">
             {isLoading ? (
               <>

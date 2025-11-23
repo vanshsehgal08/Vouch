@@ -9,11 +9,13 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, currentView, onViewChange }) => {
   return (
-    <div className="flex h-screen bg-[#0f172a] overflow-hidden text-slate-200 selection:bg-cyan-500/30">
-      {/* Background Gradients */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/5 blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/5 blur-[120px]" />
+    <div className="flex h-screen bg-black overflow-hidden text-white">
+      {/* Subtle Background Pattern */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.02]">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+          backgroundSize: '40px 40px'
+        }} />
       </div>
 
       <Sidebar currentView={currentView} onViewChange={onViewChange} />
