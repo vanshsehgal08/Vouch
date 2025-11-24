@@ -141,6 +141,7 @@ const App: React.FC = () => {
     setError(null);
     try {
       const coverLetter = await generateCoverLetter(formData);
+      setGeneratedCoverLetterContent(coverLetter);
       // Save to history
       const historyItem: HistoryItem = {
         id: Date.now().toString(),
